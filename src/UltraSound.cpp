@@ -44,6 +44,12 @@ long UltraSound::getDistance(void)
   _distance = _duration * 0.034 / 2;
   delayMicroseconds(10);
 
+  // 측정 범위 초과시 에러 처리(-1)
+  if (_distance > _ultrasound_data.range)
+  {
+    _distance = -1;
+  }
+
   // 상태 설정
   // 적정 수위
   if (_ultrasound_data.min_distance < _distance && _distance < _ultrasound_data.max_distance)
@@ -90,6 +96,7 @@ void UltraSound::loadData(void)
     _ultrasound_data.power = false;
     _ultrasound_data.max_distance = -99999;
     _ultrasound_data.min_distance = 99999;
+    _ultrasound_data.range = 0;
   }
   EEPROM.end();
 }
@@ -183,6 +190,31 @@ int UltraSound::getMaxDistance(void)
 void UltraSound::setMaxDistance(int max_distance)
 {
   _ultrasound_data.max_distance = max_distance;
+}
+
+/**
+ * @fn int UltraSound::getRange(void)
+ * @brief 측정 범위 가져오기
+ * @return 측정 범위
+ * @date 2019-09-20
+ * @author Janghun Lee (jhlee@sangsang.farm)
+ */
+int UltraSound::getRange(void)
+{
+  return _ultrasound_data.range;
+}
+
+/**
+ * @fn void UltraSound::setRange(int range)
+ * @brief 측정 범위 설정
+ * @param range 설정할 측정 범위
+ * @return void
+ * @date 2019-09-20
+ * @author Janghun Lee (jhlee@sangsang.farm)
+ */
+void UltraSound::setRange(int range)
+{
+  _ultrasound_data.range = range;
 }
 
 /**

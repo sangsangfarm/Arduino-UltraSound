@@ -63,6 +63,8 @@ struct UltrasoundData
   int min_distance;
   /** 최대 거리 */
   int max_distance;
+  /** 측정 범위 */
+  int range;
 };
 
 /**
@@ -92,6 +94,9 @@ public:
 
   int getMaxDistance(void);
   void setMaxDistance(int max_distance);
+
+  int getRange(void);
+  void setRange(int range);
 
   void setEEPROMAddress(int _eeprom_address);
 
