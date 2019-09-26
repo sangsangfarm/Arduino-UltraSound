@@ -33,22 +33,57 @@ long UltraSound::getDistance(void)
 {
   if (!_ultrasound_data.power)
     return -1;
-  digitalWrite(_trig_pin, LOW);
-  delayMicroseconds(5);
-  digitalWrite(_trig_pin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(_trig_pin, LOW);
-
-  //거리 계산
-  _duration = pulseIn(_echo_pin, HIGH);
-  _distance = _duration * 0.034 / 2;
-  delayMicroseconds(10);
-
-  // 측정 범위 초과시 에러 처리(-1)
-  if (_distance > _ultrasound_data.range)
+  _distance = 0;
+  int cnt = 0, zero_cnt = 0;
+  long distances[TRY_NUM];
+  long min_distance = 9999, max_distance = -1;
+  print("[UltraSound] ");
+  for (int i = 0; i < TRY_NUM; i++)
   {
-    _distance = -1;
+    digitalWrite(_trig_pin, LOW);
+    delayMicroseconds(5);
+    digitalWrite(_trig_pin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(_trig_pin, LOW);
+
+    //거리 계산
+    _duration = pulseIn(_echo_pin, HIGH);
+    distances[i] = _duration * 0.034 / 2;
+    printf("%d ", distances[i]);
+    delayMicroseconds(10);
+
+    // 측정 범위 내 데이터만 유효
+    if (distances[i] <= _ultrasound_data.range)
+    {
+      cnt++;
+      _distance += distances[i];
+      if (distances[i] == 0)
+        zero_cnt++;
+      // 최소값
+      if (distances[i] < min_distance)
+        min_distance = distances[i];
+      // 최대값
+      if (distances[i] > max_distance)
+        max_distance = distances[i];
+    }
   }
+  println();
+  if (zero_cnt > 0)
+  {
+    // 최소값에 0이 포함되기 때문에 1개 제외
+    cnt -= (zero_cnt - 1);
+  }
+
+  if (cnt == 0) // 유효한 데이터 없으면 에러처리(-1)
+    _distance = -1;
+  else if (cnt > 2)
+  {
+    _distance -= min_distance;
+    _distance -= max_distance;
+    _distance /= (cnt - 2);
+  }
+  else
+    _distance /= cnt;
 
   // 상태 설정
   // 적정 수위
