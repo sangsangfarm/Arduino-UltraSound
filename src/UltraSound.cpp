@@ -38,8 +38,12 @@ long UltraSound::getDistance(void)
   long distances[TRY_NUM];
   long min_distance = 9999, max_distance = -1;
   print("[UltraSound] ");
+  unsigned long start_time = millis();
   for (int i = 0; i < TRY_NUM; i++)
   {
+    // 3초 안에 측정 해야함.
+    if (millis() - start_time > 3 * 1000)
+      break;
     digitalWrite(_trig_pin, LOW);
     delayMicroseconds(5);
     digitalWrite(_trig_pin, HIGH);
@@ -73,7 +77,6 @@ long UltraSound::getDistance(void)
     // 최소값에 0이 포함되기 때문에 1개 제외
     cnt -= (zero_cnt - 1);
   }
-
   if (cnt == 0) // 유효한 데이터 없으면 에러처리(-1)
     _distance = -1;
   else if (cnt > 2)
