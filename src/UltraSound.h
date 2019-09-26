@@ -15,6 +15,8 @@
 #define EEPROM_SIZE 4096
 #endif
 
+#define TRY_NUM 10
+
 //Debug
 #ifndef ULTRA_SOUND_DEBUG_PORT
 #define ULTRA_SOUND_DEBUG_PORT Serial
